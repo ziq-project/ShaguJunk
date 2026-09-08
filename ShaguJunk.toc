@@ -1,5 +1,5 @@
 ## Interface: 11200
-## Title: |cff33ffccShagu|cffffffffJunk
+## Title: |cff33ffccShagu|cffffffffJunk |cff7fff7f - Project Legacy|r
 ## Author: Shagu | a Project Legacy fork by ziq
 ## Notes: Automatically deletes or vendors specified items
 ## Version: 1.0
