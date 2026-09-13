@@ -6,6 +6,11 @@ do -- config
 
   SLASH_SHAGUJUNK1, SLASH_SHAGUJUNK2, SLASH_SHAGUJUNK3 = "/sjunk", "/junk", "/sj"
   SlashCmdList["SHAGUJUNK"] = function(message)
+    -- Same crash-corrupted-SavedVariables guard as the OnUpdate handlers
+    -- below -- the slash command can run before either of those ticks.
+    ShaguJunk_vendor = ShaguJunk_vendor or {}
+    ShaguJunk_delete = ShaguJunk_delete or {}
+
     local commandlist = { }
     local command
 
@@ -103,6 +108,14 @@ do -- autovendor
   end)
 
   autovendor:SetScript("OnUpdate", function()
+    -- Guard against a crash-corrupted SavedVariables file (confirmed this
+    -- session across several other addons: a client crash can write these
+    -- out as literal "= nil" -- the top-level "X = X or {}" default above
+    -- runs BEFORE SavedVariables load, so it can't recover from that on its
+    -- own. No ADDON_LOADED handler exists here to re-guard once after load,
+    -- so re-guard every tick instead -- cheap, and self-heals immediately.
+    ShaguJunk_vendor = ShaguJunk_vendor or {}
+
     -- throttle to to one item per .1 second
     if ( this.tick or 1) > GetTime() then return else this.tick = GetTime() + .1 end
 
@@ -145,6 +158,9 @@ do -- autodelete
   end)
 
   autodelete:SetScript("OnUpdate", function()
+    -- Same crash-corrupted-SavedVariables guard as autovendor above.
+    ShaguJunk_delete = ShaguJunk_delete or {}
+
     -- throttle to to one item per .1 second
     if ( this.tick or 1) > GetTime() then return else this.tick = GetTime() + .1 end
 
